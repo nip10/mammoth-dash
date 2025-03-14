@@ -41,7 +41,7 @@ export interface GameState {
   /** Whether the game has started */
   gameStarted: boolean;
   /** Map of all players by their ID */
-  players: Record<string, PlayerState>;
+  players: { [key: string]: PlayerState };
   /** The terrain elevation data */
   terrain: TerrainPoint[];
   /** X-coordinate of the finish line */
@@ -81,6 +81,15 @@ export interface JoinMessage extends BaseMessage {
   playerId: string;
   /** Color chosen for the player */
   playerColor: string;
+  initialPosition: {
+    x: number;
+    y: number;
+    z: number;
+    velocityX: number;
+    velocityY: number;
+    isJumping: boolean;
+    finished: boolean;
+  };
 }
 
 /**
@@ -173,4 +182,13 @@ export interface PlayerProps {
 export interface FinishLineProps {
   /** X-coordinate position of the finish line */
   position: number;
+}
+
+export interface PlayerUpdateMessage {
+  type: "playerUpdate";
+  player: PlayerState;
+}
+
+export interface Game2DProps {
+  roomCode: string;
 }

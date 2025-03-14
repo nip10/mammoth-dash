@@ -8,7 +8,7 @@ const initialState: GameState = {
   gameStarted: false,
   players: {},
   terrain: [],
-  finishLine: 0,
+  finishLine: 800,
   hostId: undefined,
 };
 

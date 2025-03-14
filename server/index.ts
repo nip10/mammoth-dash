@@ -28,8 +28,6 @@ type TerrainPoint = {
 // Message types
 type JoinMessage = {
   type: "join";
-  playerId: string;
-  playerColor: string;
 };
 
 type UpdatePlayerMessage = {
@@ -55,50 +53,61 @@ export default class CrazyMammothsParty implements Party.Server {
   };
 
   onConnect(conn: Party.Connection) {
-    // Send the current game state to the new connection
-    conn.send(
-      JSON.stringify({
-        type: "gameState",
-        state: this.gameState,
-      })
-    );
-
-    // Let all clients know someone joined
-    this.room.broadcast(
-      JSON.stringify({
-        type: "playerCount",
-        count: [...this.room.getConnections()].length,
-      })
-    );
+    console.log("Client connected", conn.id);
   }
 
-  onMessage(message: string) {
+  onMessage(message: string, sender: Party.Connection) {
     const data = JSON.parse(message) as GameMessage;
 
     switch (data.type) {
       case "join":
-        // Add new player to the game
-        this.gameState.players[data.playerId] = {
-          id: data.playerId,
-          x: 0,
-          y: 0,
+        // Generate a unique player ID
+        const playerId = `player_${Math.random().toString(36).substring(2, 9)}`;
+
+        // Generate a unique color for the player
+        const color = this.generateUniqueColor(
+          Object.values(this.gameState.players)
+        );
+
+        // Calculate a good starting position
+        const startX = this.calculateStartPosition(
+          Object.values(this.gameState.players)
+        );
+        const startY = 300; // Ground level
+
+        // Create the player with server-assigned properties
+        this.gameState.players[playerId] = {
+          id: playerId,
+          x: startX,
+          y: startY,
           z: 0,
           velocityY: 0,
           isJumping: false,
-          color: data.playerColor,
+          color: color,
           finished: false,
         };
 
-        // If this is the first player, make them the host and generate terrain
+        // If this is the first player, make them the host
         if (Object.keys(this.gameState.players).length === 1) {
-          this.gameState.hostId = data.playerId;
-          this.generateTerrain();
+          this.gameState.hostId = playerId;
         }
 
-        // Broadcast updated game state
+        // Send the player their ID
+        sender.send(
+          JSON.stringify({
+            type: "joined",
+            playerId,
+          })
+        );
+
+        // Broadcast updated game state to all clients
         this.broadcastGameState();
         break;
-
+      case "startGame":
+        // Start the game
+        this.gameState.gameStarted = true;
+        this.broadcastGameState();
+        break;
       case "updatePlayer":
         // Update player state
         if (this.gameState.players[data.player.id]) {
@@ -106,20 +115,13 @@ export default class CrazyMammothsParty implements Party.Server {
           this.broadcastGameState();
         }
         break;
-
-      case "startGame":
-        // Start the game
-        this.gameState.gameStarted = true;
-        this.broadcastGameState();
+      default:
+        console.log("Unknown message type:", data);
         break;
     }
   }
 
-  onClose(conn: Party.Connection) {
-    // Find and remove players associated with this connection
-    // In a real app with authentication, you'd have a more robust way to track this
-    const playersToRemove: string[] = [];
-
+  onClose() {
     // For now, we'll just check if the host disconnected
     // In a real app, you'd track which connection belongs to which player
     if (this.gameState.hostId) {
@@ -131,14 +133,6 @@ export default class CrazyMammothsParty implements Party.Server {
         this.gameState.hostId = undefined;
       }
     }
-
-    // Broadcast updated player count
-    this.room.broadcast(
-      JSON.stringify({
-        type: "playerCount",
-        count: [...this.room.getConnections()].length,
-      })
-    );
 
     // Broadcast updated game state with new host
     this.broadcastGameState();
@@ -185,5 +179,39 @@ export default class CrazyMammothsParty implements Party.Server {
         state: this.gameState,
       })
     );
+  }
+
+  // Helper function to generate a unique color
+  generateUniqueColor(players: PlayerState[]) {
+    const usedColors = players.map((p) => p.color);
+    let color;
+
+    do {
+      // Generate a random color in hexadecimal format
+      const r = Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+      const g = Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+      const b = Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+      color = `0x${r}${g}${b}`;
+    } while (usedColors.includes(color));
+
+    return color;
+  }
+
+  // Helper function to calculate start position
+  calculateStartPosition(players: PlayerState[]) {
+    if (players.length === 0) {
+      return 50; // Default starting position
+    }
+
+    // Find the rightmost player
+    const rightmostX = Math.max(...players.map((p) => p.x));
+    // Place new player 60px to the right (enough space for player width + gap)
+    return rightmostX + 60;
   }
 }

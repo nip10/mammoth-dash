@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import './globals.css';
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -12,14 +11,17 @@ export default function Home() {
 
   const createRoom = () => {
     // Generate random room code
-    const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    router.push(`/game/${newRoomCode}`);
+    const newRoomCode = Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase();
+    router.push(`/room/${newRoomCode}`);
   };
 
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (roomCode.trim()) {
-      router.push(`/game/${roomCode.trim().toUpperCase()}`);
+      router.push(`/room/${roomCode.trim().toUpperCase()}`);
     }
   };
 
