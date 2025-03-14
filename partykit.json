@@ -1,0 +1,4 @@
+{
+  "name": "mammoth-dash",
+  "main": "server/index.ts"
+}
