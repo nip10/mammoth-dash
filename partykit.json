@@ -1,4 +1,5 @@
 {
   "name": "mammoth-dash",
-  "main": "server/index.ts"
+  "main": "server/index.ts",
+  "compatibilityDate": "2025-03-14"
 }
