@@ -1,4 +1,3 @@
-// components/Environment.tsx
 "use client";
 
 import { useRef, useMemo } from "react";
@@ -31,7 +30,7 @@ export default function Environment() {
     }
 
     // Add the positions to the geometry
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     return geometry;
   }, []);
 
@@ -107,7 +106,8 @@ export default function Environment() {
   // Animate snow falling
   useFrame((state) => {
     if (snowRef.current) {
-      const positions = snowRef.current.geometry.attributes.position.array as Float32Array;
+      const positions = snowRef.current.geometry.attributes.position
+        .array as Float32Array;
       const time = state.clock.getElapsedTime();
 
       for (let i = 0; i < positions.length; i += 3) {
