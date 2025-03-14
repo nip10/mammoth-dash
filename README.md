@@ -42,24 +42,6 @@ A real-time multiplayer racing game built with Next.js, Three.js, and PartyKit.
 
 ## Development
 
-# Project Structure
-
-- `/components` - React components including 3D game elements
-- `/pages` - Next.js pages and API routes
-- `/public` - Static assets including textures
-- `/store` - Zustand state management
-- `/types` - TypeScript type definitions
-- `/utils` - Utility functions
-- `/party` - PartyKit server code for multiplayer functionality
-
-# Future Improvements
-
-- Add more varied terrain with obstacles
-- Implement power-ups and special abilities
-- Add customizable player characters
-- Create tournament mode with multiple races
-- Add sound effects and background music
-
 ```bash
 # Install dependencies
 npm install
@@ -75,3 +57,22 @@ npm run build
 
 # Start production server
 npm start
+```
+
+## Project Structure
+
+- `/components` - React components including 3D game elements
+- `/pages` - Next.js pages and API routes
+- `/public` - Static assets including textures
+- `/store` - Zustand state management
+- `/types` - TypeScript type definitions
+- `/utils` - Utility functions
+- `/party` - PartyKit server code for multiplayer functionality
+
+## Future Improvements
+
+- Add more varied terrain with obstacles
+- Implement power-ups and special abilities
+- Add customizable player characters
+- Create tournament mode with multiple races
+- Add sound effects and background music
